@@ -24,7 +24,22 @@ pool.query(`
 
 app.get("/users", (req, res) => {
 	pool.query("SELECT * FROM users")
-		.then(result => res.json(result.rows))
+		.then(result => res.status(201).json(result.rows))
+		.catch((err) => res.send(404, "Error", err));
+});
+
+app.post("/users", (req, res) => {
+	pool.query("INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *", [req.body.name, req.body.email])
+		.then(result => res.status(201).json(result.rows))
+		.catch((err) => res.send(404, err));
+});
+
+app.delete("/users/:id", (req, res) => {
+	pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [req.params.id])
+		.then(result => {
+			if (result.rowCount === 0) return res.status(404).json({ error: "User not found" });
+			res.json({ message: "User deleted" });
+		})
 		.catch((err) => res.send(404, "Error", err));
 });
 
