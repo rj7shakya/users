@@ -1,0 +1,6 @@
+- npm init -y 
+
+- npm i express pg 
+
+- create new file called index.js
+
